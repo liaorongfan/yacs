@@ -24,40 +24,18 @@ import copy
 import io
 import logging
 import os
-import sys
 from ast import literal_eval
-
 import yaml
+import importlib.util
 
-# Flag for py2 and py3 compatibility to use when separate code paths are necessary
-# When _PY2 is False, we assume Python 3 is in use
-_PY2 = sys.version_info.major == 2
 
+logger = logging.getLogger(__name__)
 # Filename extensions for loading configs from files
 _YAML_EXTS = {"", ".yaml", ".yml"}
 _PY_EXTS = {".py"}
-
-# py2 and py3 compatibility for checking file object type
-# We simply use this to infer py2 vs py3
-if _PY2:
-    _FILE_TYPES = (file, io.IOBase)
-else:
-    _FILE_TYPES = (io.IOBase,)
-
+_FILE_TYPES = (io.IOBase,)
 # CfgNodes can only contain a limited set of valid types
 _VALID_TYPES = {tuple, list, str, int, float, bool, type(None)}
-# py2 allow for str and unicode
-if _PY2:
-    _VALID_TYPES = _VALID_TYPES.union({unicode})  # noqa: F821
-
-# Utilities for importing modules from file paths
-if _PY2:
-    # imp is available in both py2 and py3 for now, but is deprecated in py3
-    import imp
-else:
-    import importlib.util
-
-logger = logging.getLogger(__name__)
 
 
 class CfgNode(dict):
@@ -546,10 +524,7 @@ def _assert_with_logging(cond, msg):
 
 
 def _load_module_from_file(name, filename):
-    if _PY2:
-        module = imp.load_source(name, filename)
-    else:
-        spec = importlib.util.spec_from_file_location(name, filename)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+    spec = importlib.util.spec_from_file_location(name, filename)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
     return module
