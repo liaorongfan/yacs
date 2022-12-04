@@ -1,4 +1,6 @@
 from config import cfg
+from yacs.config import get_cfg
+
 
 if __name__ == "__main__":
     cfg.merge_from_file("config.yaml")
@@ -8,8 +10,7 @@ if __name__ == "__main__":
     cfg2.defrost()
     cfg2.TRAIN.SCALES = (8, 16, 32)
     cfg2.freeze()
-
-    print("cfg:")
-    print(cfg)
-    print("cfg2:")
-    print(cfg2)
+    cfg3 = get_cfg()
+    print(f"cfg:\n-----\n{cfg} \n")
+    print(f"cfg2:\n-----\n{cfg2} \n")
+    print(f"cfg3:\n-----\n{cfg3} \n")
