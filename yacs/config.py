@@ -113,7 +113,7 @@ class CfgNode(dict):
         return dic
 
     def __getattr__(self, name):
-        if name in self:
+        if name in self:  # if sub-string in strings
             return self[name]
         else:
             raise AttributeError(name)
@@ -121,20 +121,16 @@ class CfgNode(dict):
     def __setattr__(self, name, value):
         if self.is_frozen():
             raise AttributeError(
-                "Attempted to set {} to {}, but CfgNode is immutable".format(
-                    name, value
-                )
+                f"Attempted to set {name} to {value}, but CfgNode is immutable"
             )
 
         _assert_with_logging(
             name not in self.__dict__,
-            "Invalid attempt to modify internal CfgNode state: {}".format(name),
+            f"Invalid attempt to modify internal CfgNode state: {name}",
         )
         _assert_with_logging(
             _valid_type(value, allow_cfg_node=True),
-            "Invalid type {} for key {}; valid types = {}".format(
-                type(value), name, _VALID_TYPES
-            ),
+            f"Invalid type {type(value)} for key {name}; valid types = {_VALID_TYPES}"
         )
 
         self[name] = value
@@ -161,7 +157,10 @@ class CfgNode(dict):
         return r
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, super(CfgNode, self).__repr__())
+        return "{} ({})".format(
+            self.__class__.__name__,
+            super(CfgNode, self).__repr__(),
+        )
 
     def dump(self, **kwargs):
         """Dump to a string."""
